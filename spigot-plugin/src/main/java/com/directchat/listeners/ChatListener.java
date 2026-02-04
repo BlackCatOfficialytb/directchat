@@ -28,6 +28,7 @@ public class ChatListener implements Listener {
      * Handle chat messages.
      * Cancel if player is not authenticated via DirectChat.
      */
+    @SuppressWarnings("deprecation") // Using deprecated event for Spigot compatibility
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();

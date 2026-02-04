@@ -110,6 +110,10 @@ public class DirectChatPlugin extends JavaPlugin {
         return captchaProvider;
     }
 
+    public boolean isRequireHttps() {
+        return requireHttps;
+    }
+
     public boolean isDebug() {
         return debug;
     }
