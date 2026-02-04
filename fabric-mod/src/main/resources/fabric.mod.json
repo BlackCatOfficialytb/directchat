@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "directchat",
+  "version": "${version}",
+  "name": "DirectChat",
+  "description": "Intercepts local chat and redirects to an external HTTP/HTTPS API for secure communication.",
+  "authors": ["DirectChat Team"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/directchat/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.directchat.DirectChatMod"]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ">=1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
