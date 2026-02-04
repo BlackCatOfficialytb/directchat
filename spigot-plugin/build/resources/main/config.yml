@@ -1,0 +1,29 @@
+# DirectChat Plugin Configuration
+
+# Global password for authentication
+# Players must provide this password to authenticate via DirectChat mod
+password: "changeme"
+
+# API server port
+# The embedded HTTP server will listen on this port
+port: 36679
+
+# HTTPS settings
+# Set to true to require SSL/TLS (you must provide keystore)
+require-https: false
+keystore-path: ""
+keystore-password: ""
+
+# Captcha provider integration
+# Options: none, nantibot, captcha-api
+captcha-provider: none
+
+# Message history settings
+# Maximum number of messages to keep in memory for /api/fetch
+message-history-size: 100
+
+# Token expiry time in seconds (0 = never expires)
+token-expiry: 3600
+
+# Debug mode
+debug: false

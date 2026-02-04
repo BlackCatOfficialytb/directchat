@@ -1,0 +1,24 @@
+name: DirectChat
+version: '1.0.1'
+main: com.directchat.DirectChatPlugin
+api-version: '1.21'
+description: Server-side plugin hosting an internal API for DirectChat mod
+authors: [DirectChat Team]
+
+softdepend:
+  - nAntiBot
+  - Captcha
+
+commands:
+  directchat:
+    description: DirectChat management commands
+    usage: /<command> [args]
+    permission: directchat.admin
+
+permissions:
+  directchat.admin:
+    description: Allows access to DirectChat admin commands
+    default: op
+  directchat.bypass:
+    description: Bypass DirectChat authentication requirement
+    default: false

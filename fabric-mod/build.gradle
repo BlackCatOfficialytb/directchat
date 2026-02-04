@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -54,4 +54,9 @@ jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
     }
+}
+
+// Disable Javadoc generation to avoid strict namespace checks in Loom 1.11
+tasks.withType(Javadoc).configureEach {
+    enabled = false
 }
