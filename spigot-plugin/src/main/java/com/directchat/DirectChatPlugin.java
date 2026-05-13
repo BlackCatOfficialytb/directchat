@@ -78,7 +78,7 @@ public class DirectChatPlugin extends JavaPlugin {
         reloadConfig();
 
         password = getConfig().getString("password", "changeme");
-        port = getConfig().getInt("port", 36679);
+        port = getConfig().getInt("port", 36769);
         requireHttps = getConfig().getBoolean("require-https", false);
         captchaProvider = getConfig().getString("captcha-provider", "none");
         messageHistorySize = getConfig().getInt("message-history-size", 100);

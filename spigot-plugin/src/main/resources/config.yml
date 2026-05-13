@@ -6,7 +6,7 @@ password: "changeme"
 
 # API server port
 # The embedded HTTP server will listen on this port
-port: 36679
+port: 36769
 
 # HTTPS settings
 # Set to true to require SSL/TLS (you must provide keystore)
