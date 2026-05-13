@@ -6,7 +6,7 @@
 
     <groupId>com.directchat</groupId>
     <artifactId>directchat-plugin</artifactId>
-    <version>0.1.0.0.2026.05.13</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>DirectChat</name>

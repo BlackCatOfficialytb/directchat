@@ -6,17 +6,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- * Listens to player chat and command events.
- * Blocks unauthenticated players from chatting or using commands.
+ * Listens to player chat events.
+ * Blocks unauthenticated players from chatting via normal chat.
+ * All commands (including /login, /register, etc.) are allowed to pass through.
  */
 public class ChatListener implements Listener {
 
-    private static final String ACCESS_DENIED_MESSAGE = "§cAccess Denied. Please connect via DirectChat Mod to speak.";
-    private static final String DIRECTCHAT_COMMAND = "directchat";
+    private static final String ACCESS_DENIED_MESSAGE = "\u00a7cAccess Denied. Please connect via DirectChat Mod to speak.";
 
     private final DirectChatPlugin plugin;
 
@@ -43,33 +42,6 @@ public class ChatListener implements Listener {
             event.setCancelled(true);
             player.sendMessage(ACCESS_DENIED_MESSAGE);
             plugin.debug("Blocked chat from unauthenticated player: " + player.getName());
-        }
-    }
-
-    /**
-     * Handle commands.
-     * Block all commands except /directchat for unauthenticated players.
-     */
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onCommand(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        String message = event.getMessage().toLowerCase();
-
-        // Always allow /directchat command
-        if (message.startsWith("/" + DIRECTCHAT_COMMAND)) {
-            return;
-        }
-
-        // Check if player has bypass permission
-        if (player.hasPermission("directchat.bypass")) {
-            return;
-        }
-
-        // Check if player is authenticated
-        if (!plugin.getTokenManager().isAuthenticated(player.getUniqueId())) {
-            event.setCancelled(true);
-            player.sendMessage(ACCESS_DENIED_MESSAGE);
-            plugin.debug("Blocked command from unauthenticated player: " + player.getName() + " -> " + message);
         }
     }
 

@@ -94,6 +94,6 @@ The API is hosted on the Minecraft server on the configured port (default: `3676
 ```json
 {
   "status": "OK",
-  "version": "0.1.0.1.2026.05.13"
+  "version": "1.0.1"
 }
 ```
