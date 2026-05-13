@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version '1.15'
     id 'maven-publish'
 }
 
@@ -14,33 +14,15 @@ repositories {
     mavenCentral()
 }
 
-loom {
-    accessWidenerPath = file("src/main/resources/directchat.accesswidener")
-}
-
 dependencies {
-    // Minecraft and mappings
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-
-    // Fabric loader and API
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // Fabric loader and API for unobfuscated versions
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
     // GSON for JSON handling (bundled with Minecraft but declare for clarity)
     implementation 'com.google.code.gson:gson:2.10.1'
 }
 
-// Disable Javadoc generation entirely
-tasks.withType(Javadoc).configureEach {
-    enabled = false
-}
-
-// Additional fix for Loom namespace issues
-project.afterEvaluate {
-    if (tasks.findByName("genSources")) {
-        tasks.named("genSources").configure {
-            enabled = false
-        }
-    }
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
 }

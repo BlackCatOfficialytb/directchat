@@ -24,6 +24,22 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        // Handle /chat and /c directly
+        if (label.equalsIgnoreCase("chat") || label.equalsIgnoreCase("c")) {
+            if (!(sender instanceof org.bukkit.entity.Player)) {
+                sender.sendMessage("§cOnly players can use this command.");
+                return true;
+            }
+            if (args.length == 0) {
+                sender.sendMessage("§cUsage: /" + label + " <message>");
+                return true;
+            }
+            String message = String.join(" ", args);
+            plugin.getChatManager().broadcastMessage((org.bukkit.entity.Player) sender, message);
+            return true;
+        }
+
+        // Handle /directchat and /dchat
         if (args.length == 0) {
             sendHelp(sender);
             return true;
@@ -32,6 +48,21 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
+            case "chat":
+                if (!(sender instanceof org.bukkit.entity.Player)) {
+                    sender.sendMessage("§cOnly players can use this command.");
+                    return true;
+                }
+                if (args.length < 2) {
+                    sender.sendMessage("§cUsage: /" + label + " chat <message>");
+                    return true;
+                }
+                String[] messageArgs = new String[args.length - 1];
+                System.arraycopy(args, 1, messageArgs, 0, args.length - 1);
+                String message = String.join(" ", messageArgs);
+                plugin.getChatManager().broadcastMessage((org.bukkit.entity.Player) sender, message);
+                return true;
+
             case "reload":
                 if (!sender.hasPermission("directchat.admin")) {
                     sender.sendMessage("§cYou don't have permission to do this.");
@@ -56,9 +87,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage("§6=== DirectChat Admin Commands ===");
-        sender.sendMessage("§e/directchat reload §7- Reload configuration");
-        sender.sendMessage("§e/directchat stats §7- Show server statistics");
+        sender.sendMessage("§6=== DirectChat Commands ===");
+        sender.sendMessage("§e/directchat chat <msg> §7- Send message to DirectChat");
+        if (sender.hasPermission("directchat.admin")) {
+            sender.sendMessage("§e/directchat reload §7- Reload configuration");
+            sender.sendMessage("§e/directchat stats §7- Show server statistics");
+        }
     }
 
     private void sendStats(CommandSender sender) {
@@ -73,6 +107,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> options = new ArrayList<>();
+            options.add("chat");
             if (sender.hasPermission("directchat.admin")) {
                 options.add("reload");
                 options.add("stats");

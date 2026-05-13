@@ -56,6 +56,8 @@ public class DirectChatPlugin extends JavaPlugin {
         CommandHandler commandHandler = new CommandHandler(this);
         getCommand("directchat").setExecutor(commandHandler);
         getCommand("directchat").setTabCompleter(commandHandler);
+        getCommand("chat").setExecutor(commandHandler);
+        getCommand("chat").setTabCompleter(commandHandler);
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);

@@ -15,6 +15,10 @@ commands:
     usage: /<command> [args]
     permission: directchat.admin
     aliases: [dchat]
+  chat:
+    description: Send a message to DirectChat
+    usage: /<command> <message>
+    aliases: [c]
 
 permissions:
   directchat.admin:
