@@ -137,7 +137,7 @@ public class WebServer {
     private class HealthHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            sendResponse(exchange, 200, "{\"status\":\"OK\",\"plugin\":\"DirectChat\",\"version\":\"1.0.0\"}");
+            sendResponse(exchange, 200, "{\"status\":\"OK\",\"plugin\":\"DirectChat\",\"version\":\"0.1.0.0.2026.05.13\"}");
         }
     }
 
