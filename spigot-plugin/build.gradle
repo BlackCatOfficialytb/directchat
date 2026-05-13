@@ -39,7 +39,9 @@ tasks.withType(JavaCompile).configureEach {
 
 shadowJar {
     archiveClassifier.set('')
-    relocate 'com.google.gson', 'com.directchat.libs.gson'
+    // Disable remapping to avoid ASM incompatibilities with Java 21
+    // We'll rely on the user having the required dependencies
+    mergeServiceFiles()
 }
 
 build {

@@ -74,8 +74,12 @@ public class ChatInterceptor {
     private static boolean onCommand(String command) {
         DirectChatMod mod = DirectChatMod.getInstance();
 
-        // Always allow /directchat commands
-        if (command.startsWith("directchat")) {
+        // Always allow DirectChat related commands to be handled by Brigadier
+        String lower = command.toLowerCase();
+        if (lower.startsWith("directchat") || 
+            lower.startsWith("dchat") || 
+            lower.startsWith("c ") || lower.equals("c") ||
+            lower.startsWith("chat ") || lower.equals("chat")) {
             return true;
         }
 

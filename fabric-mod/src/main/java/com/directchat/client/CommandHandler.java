@@ -21,38 +21,56 @@ public class CommandHandler {
      */
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            // Main command: /directchat
             dispatcher.register(ClientCommandManager.literal("directchat")
-                    // /directchat connect <url> <password>
                     .then(ClientCommandManager.literal("connect")
                             .then(ClientCommandManager.argument("url", StringArgumentType.string())
                                     .then(ClientCommandManager.argument("password", StringArgumentType.string())
-                                            .executes(context -> {
-                                                String url = StringArgumentType.getString(context, "url");
-                                                String password = StringArgumentType.getString(context, "password");
-                                                return handleConnect(url, password);
-                                            }))))
-
-                    // /directchat disconnect
-                    .then(ClientCommandManager.literal("disconnect")
-                            .executes(context -> handleDisconnect()))
-
-                    // /directchat toggle
-                    .then(ClientCommandManager.literal("toggle")
-                            .executes(context -> handleToggle()))
-
-                    // /directchat status
-                    .then(ClientCommandManager.literal("status")
-                            .executes(context -> handleStatus()))
-
-                    // /directchat help
-                    .then(ClientCommandManager.literal("help")
-                            .executes(context -> handleHelp()))
-
-                    // Default - show help
+                                            .executes(context -> handleConnect(StringArgumentType.getString(context, "url"), 
+                                                    StringArgumentType.getString(context, "password"))))))
+                    .then(ClientCommandManager.literal("disconnect").executes(context -> handleDisconnect()))
+                    .then(ClientCommandManager.literal("toggle").executes(context -> handleToggle()))
+                    .then(ClientCommandManager.literal("status").executes(context -> handleStatus()))
+                    .then(ClientCommandManager.literal("help").executes(context -> handleHelp()))
+                    .then(ClientCommandManager.literal("chat")
+                            .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
+                                    .executes(context -> handleSendMessage(StringArgumentType.getString(context, "message")))))
                     .executes(context -> handleHelp()));
+
+            // Alias: /dchat
+            dispatcher.register(ClientCommandManager.literal("dchat")
+                    .then(ClientCommandManager.literal("chat")
+                            .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
+                                    .executes(context -> handleSendMessage(StringArgumentType.getString(context, "message")))))
+                    .executes(context -> handleHelp()));
+
+            // Short aliases: /c and /chat
+            dispatcher.register(ClientCommandManager.literal("c")
+                    .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
+                            .executes(context -> handleSendMessage(StringArgumentType.getString(context, "message")))));
+
+            dispatcher.register(ClientCommandManager.literal("chat")
+                    .then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
+                            .executes(context -> handleSendMessage(StringArgumentType.getString(context, "message")))));
         });
 
         DirectChatMod.LOGGER.info("Commands registered");
+    }
+
+    private static int handleSendMessage(String message) {
+        DirectChatMod mod = DirectChatMod.getInstance();
+        if (!mod.isConnected()) {
+            sendFeedback("§c[DirectChat] Not connected! Use /directchat connect first.");
+            return 0;
+        }
+
+        mod.getApiClient().sendMessage(message)
+                .thenAccept(success -> {
+                    if (!success) {
+                        sendFeedback("§c[DirectChat] Failed to send message.");
+                    }
+                });
+        return 1;
     }
 
     private static int handleConnect(String url, String password) {

@@ -52,6 +52,11 @@ public class DirectChatPlugin extends JavaPlugin {
             return;
         }
 
+        // Register commands
+        CommandHandler commandHandler = new CommandHandler(this);
+        getCommand("directchat").setExecutor(commandHandler);
+        getCommand("directchat").setTabCompleter(commandHandler);
+
         // Register event listeners
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
 
@@ -74,7 +79,7 @@ public class DirectChatPlugin extends JavaPlugin {
         getLogger().info("DirectChat plugin disabled");
     }
 
-    private void loadConfiguration() {
+    public void loadConfiguration() {
         reloadConfig();
 
         password = getConfig().getString("password", "changeme");
@@ -106,12 +111,24 @@ public class DirectChatPlugin extends JavaPlugin {
         return password;
     }
 
+    public int getPort() {
+        return port;
+    }
+
     public String getCaptchaProvider() {
         return captchaProvider;
     }
 
     public boolean isRequireHttps() {
         return requireHttps;
+    }
+
+    public int getMessageHistorySize() {
+        return messageHistorySize;
+    }
+
+    public int getTokenExpiry() {
+        return tokenExpiry;
     }
 
     public boolean isDebug() {

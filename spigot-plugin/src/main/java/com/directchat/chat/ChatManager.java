@@ -100,6 +100,15 @@ public class ChatManager {
     }
 
     /**
+     * Get the current size of the message history.
+     */
+    public int getHistorySize() {
+        synchronized (messageHistory) {
+            return messageHistory.size();
+        }
+    }
+
+    /**
      * Clear message history.
      */
     public void clearHistory() {

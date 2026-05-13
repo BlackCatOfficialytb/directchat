@@ -14,6 +14,7 @@ commands:
     description: DirectChat management commands
     usage: /<command> [args]
     permission: directchat.admin
+    aliases: [dchat]
 
 permissions:
   directchat.admin:

@@ -277,25 +277,27 @@ public class ApiHandler {
 
     // nAntiBot integration stubs
     private String generateNAntiBotCaptcha(UUID playerUuid) {
-        // TODO: Integrate with nAntiBot API when available
-        plugin.debug("nAntiBot integration not implemented, using simple captcha");
+        if (Bukkit.getPluginManager().isPluginEnabled("nAntiBot")) {
+            // Placeholder for actual nAntiBot API integration
+            plugin.debug("nAntiBot found, but specific API integration is a stub");
+        }
         return generateSimpleCaptcha(playerUuid);
     }
 
     private boolean validateNAntiBotCaptcha(UUID playerUuid, String response) {
-        // TODO: Integrate with nAntiBot API when available
         return validateSimpleCaptcha(playerUuid, response);
     }
 
     // Captcha API integration stubs
     private String generateCaptchaApi(UUID playerUuid) {
-        // TODO: Integrate with Captcha API plugin when available
-        plugin.debug("Captcha API integration not implemented, using simple captcha");
+        if (Bukkit.getPluginManager().isPluginEnabled("Captcha")) {
+            // Placeholder for actual Captcha API integration
+            plugin.debug("Captcha API plugin found, but specific API integration is a stub");
+        }
         return generateSimpleCaptcha(playerUuid);
     }
 
     private boolean validateCaptchaApi(UUID playerUuid, String response) {
-        // TODO: Integrate with Captcha API plugin when available
         return validateSimpleCaptcha(playerUuid, response);
     }
 }

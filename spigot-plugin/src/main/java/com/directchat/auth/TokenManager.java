@@ -126,6 +126,13 @@ public class TokenManager {
     }
 
     /**
+     * Get the number of authenticated players.
+     */
+    public int getAuthenticatedCount() {
+        return playerTokens.size();
+    }
+
+    /**
      * Generate a random 16-character token.
      */
     private String generateRandomToken() {
