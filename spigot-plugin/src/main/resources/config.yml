@@ -27,3 +27,26 @@ token-expiry: 3600
 
 # Debug mode
 debug: false
+
+# Cloudflared Tunnel Mode
+# Set to true to automatically create a Cloudflare Quick Tunnel when the server starts.
+# This is useful for servers that cannot open ports manually
+# (e.g., Aternos, Play.hosting, or servers behind strict NAT/firewalls).
+# The tunnel creates a public HTTPS URL that routes to the local API port.
+#
+# Requirements:
+#   - 'cloudflared' must be installed on the server system
+#   - Download from: https://github.com/cloudflare/cloudflared/releases
+#
+# When enabled, the plugin will:
+#   1. Start the API server on localhost:{port}
+#   2. Launch 'cloudflared tunnel --url http://localhost:{port}'
+#   3. Print the public tunnel URL in the console
+#   4. Broadcast the URL to all online admins
+cloudflared-tunnel-mode: false
+
+# Cloudflared binary path
+# Leave empty ("") to use the default 'cloudflared' from system PATH.
+# Set to a full path if cloudflared is installed in a non-standard location
+# (e.g., "/usr/local/bin/cloudflared" or "C:\\Tools\\cloudflared.exe")
+cloudflared-path: ""

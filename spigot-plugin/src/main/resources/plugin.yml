@@ -2,7 +2,7 @@ name: DirectChat
 version: '${version}'
 main: com.directchat.DirectChatPlugin
 api-version: '1.21'
-description: Server-side plugin hosting an internal API for DirectChat mod
+description: Server-side plugin hosting an internal API for DirectChat mod with optional Cloudflared tunnel support
 authors: [DirectChat Team]
 
 softdepend:

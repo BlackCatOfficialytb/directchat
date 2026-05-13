@@ -1,5 +1,6 @@
 package com.directchat;
 
+import com.directchat.tunnel.CloudflaredTunnelManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,11 +28,11 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         // Handle /chat and /c directly
         if (label.equalsIgnoreCase("chat") || label.equalsIgnoreCase("c")) {
             if (!(sender instanceof org.bukkit.entity.Player)) {
-                sender.sendMessage("§cOnly players can use this command.");
+                sender.sendMessage("\u00a7cOnly players can use this command.");
                 return true;
             }
             if (args.length == 0) {
-                sender.sendMessage("§cUsage: /" + label + " <message>");
+                sender.sendMessage("\u00a7cUsage: /" + label + " <message>");
                 return true;
             }
             String message = String.join(" ", args);
@@ -50,11 +51,11 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         switch (subCommand) {
             case "chat":
                 if (!(sender instanceof org.bukkit.entity.Player)) {
-                    sender.sendMessage("§cOnly players can use this command.");
+                    sender.sendMessage("\u00a7cOnly players can use this command.");
                     return true;
                 }
                 if (args.length < 2) {
-                    sender.sendMessage("§cUsage: /" + label + " chat <message>");
+                    sender.sendMessage("\u00a7cUsage: /" + label + " chat <message>");
                     return true;
                 }
                 String[] messageArgs = new String[args.length - 1];
@@ -65,19 +66,30 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 
             case "reload":
                 if (!sender.hasPermission("directchat.admin")) {
-                    sender.sendMessage("§cYou don't have permission to do this.");
+                    sender.sendMessage("\u00a7cYou don't have permission to do this.");
                     return true;
                 }
                 plugin.loadConfiguration();
-                sender.sendMessage("§aDirectChat configuration reloaded!");
+                sender.sendMessage("\u00a7aDirectChat configuration reloaded!");
+                if (plugin.isCloudflaredTunnelMode()) {
+                    sender.sendMessage("\u00a76Note: Cloudflared tunnel changes require a server restart.");
+                }
                 return true;
 
             case "stats":
                 if (!sender.hasPermission("directchat.admin")) {
-                    sender.sendMessage("§cYou don't have permission to do this.");
+                    sender.sendMessage("\u00a7cYou don't have permission to do this.");
                     return true;
                 }
                 sendStats(sender);
+                return true;
+
+            case "tunnel":
+                if (!sender.hasPermission("directchat.admin")) {
+                    sender.sendMessage("\u00a7cYou don't have permission to do this.");
+                    return true;
+                }
+                sendTunnelInfo(sender);
                 return true;
 
             default:
@@ -87,20 +99,49 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage("§6=== DirectChat Commands ===");
-        sender.sendMessage("§e/directchat chat <msg> §7- Send message to DirectChat");
+        sender.sendMessage("\u00a76=== DirectChat Commands ===");
+        sender.sendMessage("\u00a7e/directchat chat <msg> \u00a77- Send message to DirectChat");
         if (sender.hasPermission("directchat.admin")) {
-            sender.sendMessage("§e/directchat reload §7- Reload configuration");
-            sender.sendMessage("§e/directchat stats §7- Show server statistics");
+            sender.sendMessage("\u00a7e/directchat reload \u00a77- Reload configuration");
+            sender.sendMessage("\u00a7e/directchat stats \u00a77- Show server statistics");
+            sender.sendMessage("\u00a7e/directchat tunnel \u00a77- Show tunnel status & URL");
         }
     }
 
     private void sendStats(CommandSender sender) {
-        sender.sendMessage("§6=== DirectChat Statistics ===");
-        sender.sendMessage("§7Authenticated Players: §f" + plugin.getTokenManager().getAuthenticatedCount());
-        sender.sendMessage("§7Message History: §f" + plugin.getChatManager().getHistorySize() + " messages");
-        sender.sendMessage("§7API Port: §f" + plugin.getPort());
-        sender.sendMessage("§7Secure (HTTPS): §f" + (plugin.isRequireHttps() ? "§aYes" : "§cNo"));
+        sender.sendMessage("\u00a76=== DirectChat Statistics ===");
+        sender.sendMessage("\u00a77Authenticated Players: \u00a7f" + plugin.getTokenManager().getAuthenticatedCount());
+        sender.sendMessage("\u00a77Message History: \u00a7f" + plugin.getChatManager().getHistorySize() + " messages");
+        sender.sendMessage("\u00a77API Port: \u00a7f" + plugin.getPort());
+        sender.sendMessage("\u00a77Secure (HTTPS): \u00a7f" + (plugin.isRequireHttps() ? "\u00a7aYes" : "\u00a7cNo"));
+        sender.sendMessage("\u00a77Cloudflared Tunnel: \u00a7f" + (plugin.isCloudflaredTunnelMode() ? "\u00a7aEnabled" : "\u00a7cDisabled"));
+    }
+
+    private void sendTunnelInfo(CommandSender sender) {
+        CloudflaredTunnelManager tm = plugin.getTunnelManager();
+        sender.sendMessage("\u00a76=== Cloudflared Tunnel ===");
+        sender.sendMessage("\u00a77Tunnel Mode: \u00a7f" + (plugin.isCloudflaredTunnelMode() ? "\u00a7aEnabled" : "\u00a7cDisabled"));
+
+        if (tm.isRunning() && tm.getTunnelUrl() != null) {
+            sender.sendMessage("\u00a77Status: \u00a7aRunning");
+            sender.sendMessage("\u00a77Public URL: \u00a7a" + tm.getTunnelUrl());
+            sender.sendMessage("\u00a77Local Port: \u00a7f" + plugin.getPort());
+            sender.sendMessage("\u00a77Connect Command: \u00a7e/directchat connect " + tm.getTunnelUrl() + " <password>");
+        } else if (plugin.isCloudflaredTunnelMode()) {
+            sender.sendMessage("\u00a77Status: \u00a7cNot running");
+            sender.sendMessage("\u00a7cTunnel mode is enabled but no tunnel is active.");
+            sender.sendMessage("\u00a7cCheck console for errors or restart the server.");
+        } else {
+            sender.sendMessage("\u00a77Status: \u00a77Disabled");
+            sender.sendMessage("\u00a77To enable, set \u00a7fcloudflared-tunnel-mode: true\u00a77 in config.yml");
+        }
+
+        if (tm.isCloudflaredAvailable()) {
+            sender.sendMessage("\u00a77cloudflared binary: \u00a7aFound");
+        } else {
+            sender.sendMessage("\u00a77cloudflared binary: \u00a7cNot found");
+            sender.sendMessage("\u00a7cInstall from: \u00a7fhttps://github.com/cloudflare/cloudflared/releases");
+        }
     }
 
     @Override
@@ -111,6 +152,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("directchat.admin")) {
                 options.add("reload");
                 options.add("stats");
+                options.add("tunnel");
             }
             return options.stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))

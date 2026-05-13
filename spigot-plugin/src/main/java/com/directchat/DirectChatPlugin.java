@@ -4,6 +4,7 @@ import com.directchat.api.WebServer;
 import com.directchat.auth.TokenManager;
 import com.directchat.chat.ChatManager;
 import com.directchat.listeners.ChatListener;
+import com.directchat.tunnel.CloudflaredTunnelManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -19,6 +20,7 @@ public class DirectChatPlugin extends JavaPlugin {
     private WebServer webServer;
     private TokenManager tokenManager;
     private ChatManager chatManager;
+    private CloudflaredTunnelManager tunnelManager;
 
     // Configuration values
     private String password;
@@ -28,6 +30,8 @@ public class DirectChatPlugin extends JavaPlugin {
     private int messageHistorySize;
     private int tokenExpiry;
     private boolean debug;
+    private boolean cloudflaredTunnelMode;
+    private String cloudflaredPath;
 
     @Override
     public void onEnable() {
@@ -41,6 +45,9 @@ public class DirectChatPlugin extends JavaPlugin {
         tokenManager = new TokenManager(tokenExpiry);
         chatManager = new ChatManager(messageHistorySize);
 
+        // Initialize cloudflared tunnel manager
+        tunnelManager = new CloudflaredTunnelManager(this, cloudflaredPath);
+
         // Start web server
         webServer = new WebServer(this, port);
         try {
@@ -50,6 +57,11 @@ public class DirectChatPlugin extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Failed to start API server", e);
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+
+        // Start cloudflared tunnel if enabled
+        if (cloudflaredTunnelMode) {
+            startCloudflaredTunnel();
         }
 
         // Register commands
@@ -67,6 +79,11 @@ public class DirectChatPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Stop cloudflared tunnel
+        if (tunnelManager != null) {
+            tunnelManager.stopTunnel();
+        }
+
         // Stop web server
         if (webServer != null) {
             webServer.stop();
@@ -81,6 +98,28 @@ public class DirectChatPlugin extends JavaPlugin {
         getLogger().info("DirectChat plugin disabled");
     }
 
+    /**
+     * Start the Cloudflare Quick Tunnel.
+     * Called asynchronously — tunnel URL is logged once established.
+     */
+    private void startCloudflaredTunnel() {
+        if (!tunnelManager.isCloudflaredAvailable()) {
+            getLogger().severe("[Cloudflared] cloudflared-tunnel-mode is enabled but 'cloudflared' binary was not found!");
+            getLogger().severe("[Cloudflared] Please install cloudflared: https://github.com/cloudflare/cloudflared/releases");
+            getLogger().severe("[Cloudflared] Or set cloudflared-tunnel-mode to false in config.yml");
+            return;
+        }
+
+        getLogger().info("[Cloudflared] Tunnel mode enabled — starting Quick Tunnel...");
+
+        tunnelManager.startTunnel(port)
+                .thenAccept(url -> getLogger().info("[Cloudflared] Clients can connect via: " + url))
+                .exceptionally(e -> {
+                    getLogger().log(Level.WARNING, "[Cloudflared] Failed to start tunnel: " + e.getMessage(), e);
+                    return null;
+                });
+    }
+
     public void loadConfiguration() {
         reloadConfig();
 
@@ -91,6 +130,8 @@ public class DirectChatPlugin extends JavaPlugin {
         messageHistorySize = getConfig().getInt("message-history-size", 100);
         tokenExpiry = getConfig().getInt("token-expiry", 3600);
         debug = getConfig().getBoolean("debug", false);
+        cloudflaredTunnelMode = getConfig().getBoolean("cloudflared-tunnel-mode", false);
+        cloudflaredPath = getConfig().getString("cloudflared-path", "");
 
         if ("changeme".equals(password)) {
             getLogger().warning("Using default password! Please change it in config.yml");
@@ -107,6 +148,14 @@ public class DirectChatPlugin extends JavaPlugin {
 
     public ChatManager getChatManager() {
         return chatManager;
+    }
+
+    public WebServer getWebServer() {
+        return webServer;
+    }
+
+    public CloudflaredTunnelManager getTunnelManager() {
+        return tunnelManager;
     }
 
     public String getPassword() {
@@ -135,6 +184,14 @@ public class DirectChatPlugin extends JavaPlugin {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    public boolean isCloudflaredTunnelMode() {
+        return cloudflaredTunnelMode;
+    }
+
+    public String getCloudflaredPath() {
+        return cloudflaredPath;
     }
 
     public void debug(String message) {
